@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sorting Visualizer — Christian Tyler</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #111110;
+      --bg2:    #161614;
+      --card:   #1f1f1d;
+      --border: rgba(255,255,255,0.07);
+      --b2:     rgba(255,255,255,0.13);
+      --accent: #c8b97a;
+      --text:   #e8e6e0;
+      --muted:  #7a7870;
+      --dim:    #4a4844;
+      --mono:   'DM Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+      --serif:  'EB Garamond', Georgia, serif;
+      --r:      8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 300; display: flex; flex-direction: column; }
+    a { color: inherit; text-decoration: none; }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .back { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
+    .back:hover { color: var(--text); }
+    .header-title { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; }
+
+    main { flex: 1; display: flex; flex-direction: column; max-width: 900px; width: 100%; margin: 0 auto; padding: 3rem 2rem; gap: 2rem; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .btn {
+      padding: 0.5rem 1.1rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover { border-color: var(--b2); color: var(--text); }
+    .btn.active { border-color: var(--accent); color: var(--accent); }
+    .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-run { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .btn-run:hover { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+    .speed-wrap { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; font-family: var(--mono); font-size: 0.68rem; color: var(--muted); }
+    .speed-wrap input { width: 90px; accent-color: var(--accent); }
+
+    .size-wrap { display: flex; align-items: center; gap: 0.6rem; font-family: var(--mono); font-size: 0.68rem; color: var(--muted); }
+    .size-wrap input { width: 70px; accent-color: var(--accent); }
+
+    .canvas-wrap {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    canvas { display: block; width: 100%; height: 340px; }
+
+    .stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1rem 1.5rem;
+      min-width: 140px;
+    }
+    .stat-label { font-family: var(--mono); font-size: 0.63rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }
+    .stat-val { font-family: var(--serif); font-size: 1.8rem; color: var(--text); }
+
+    .explainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    .algo-card { background: var(--card); padding: 1.25rem 1.5rem; }
+    .algo-name { font-family: var(--mono); font-size: 0.68rem; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .algo-complexity { font-family: var(--mono); font-size: 0.75rem; color: var(--text); margin-bottom: 0.4rem; }
+    .algo-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+    .legend { display: flex; gap: 1.5rem; flex-wrap: wrap; font-family: var(--mono); font-size: 0.65rem; color: var(--muted); align-items: center; }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+    footer { border-top: 1px solid var(--border); padding: 1.25rem 2rem; font-family: var(--mono); font-size: 0.65rem; color: var(--dim); }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="index.html">← Back to Portfolio</a>
+  <div class="header-title">Sorting Algorithm Visualizer</div>
+  <div style="font-family:var(--mono);font-size:0.65rem;color:var(--dim);">Christian Tyler</div>
+</header>
+
+<main>
+  <div class="controls">
+    <button class="btn active" data-algo="bubble" id="btn-bubble">Bubble</button>
+    <button class="btn" data-algo="selection" id="btn-selection">Selection</button>
+    <button class="btn" data-algo="insertion" id="btn-insertion">Insertion</button>
+    <button class="btn" data-algo="merge" id="btn-merge">Merge</button>
+    <button class="btn" id="btn-shuffle">Shuffle</button>
+    <button class="btn btn-run" id="btn-run">Run ▶</button>
+    <div class="size-wrap">
+      <span>Size</span>
+      <input type="range" id="arr-size" min="10" max="80" value="40">
+      <span id="size-label">40</span>
+    </div>
+    <div class="speed-wrap">
+      <span>Speed</span>
+      <input type="range" id="sort-speed" min="1" max="20" value="8">
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#c8b97a"></div>Comparing (A)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e8e6e0"></div>Comparing (B)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(200,185,122,0.3)"></div>Sorted</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.15)"></div>Unsorted</div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="sort-canvas"></canvas>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box"><div class="stat-label">Comparisons</div><div class="stat-val" id="sort-comps">0</div></div>
+    <div class="stat-box"><div class="stat-label">Swaps / Writes</div><div class="stat-val" id="sort-swaps">0</div></div>
+    <div class="stat-box"><div class="stat-label">Algorithm</div><div class="stat-val" id="sort-algo" style="font-size:1.1rem;padding-top:0.4rem;">Bubble Sort</div></div>
+    <div class="stat-box"><div class="stat-label">Status</div><div class="stat-val" id="sort-status" style="font-size:1rem;padding-top:0.4rem;">Ready</div></div>
+  </div>
+
+  <div class="explainer">
+    <div class="algo-card">
+      <div class="algo-name">Bubble Sort</div>
+      <div class="algo-complexity">O(n²) avg/worst</div>
+      <div class="algo-desc">Repeatedly swaps adjacent elements that are in the wrong order. Simple but slow for large inputs.</div>
+    </div>
+    <div class="algo-card">
+      <div class="algo-name">Selection Sort</div>
+      <div class="algo-complexity">O(n²) avg/worst</div>
+      <div class="algo-desc">Finds the minimum element each pass and places it at the front. Minimizes swaps but not comparisons.</div>
+    </div>
+    <div class="algo-card">
+      <div class="algo-name">Insertion Sort</div>
+      <div class="algo-complexity">O(n²) avg · O(n) best</div>
+      <div class="algo-desc">Builds a sorted subarray one element at a time. Fast on nearly-sorted data.</div>
+    </div>
+    <div class="algo-card">
+      <div class="algo-name">Merge Sort</div>
+      <div class="algo-complexity">O(n log n) always</div>
+      <div class="algo-desc">Divides and conquers — splits the array, sorts each half, then merges. Stable and predictable.</div>
+    </div>
+  </div>
+</main>
+
+<footer>Sorting Visualizer · Built with vanilla JS + Canvas API · Christian Tyler · UNC Chapel Hill</footer>
+
+<script>
+(function () {
+  const canvas = document.getElementById('sort-canvas');
+  const ctx    = canvas.getContext('2d');
+  let N = 40, arr = [], highlights = {}, running = false, algo = 'bubble';
+  let comps = 0, swaps = 0;
+  const LABELS = { bubble:'Bubble Sort', selection:'Selection Sort', insertion:'Insertion Sort', merge:'Merge Sort' };
+
+  function shuffle() {
+    if (running) return;
+    N = +document.getElementById('arr-size').value;
+    arr = Array.from({length: N}, (_, i) => i + 1).sort(() => Math.random() - .5);
+    highlights = {}; comps = 0; swaps = 0;
+    updateInfo('Ready'); draw();
+  }
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width  = rect.width;
+    canvas.height = 340;
+    draw();
+  }
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const bw = W / arr.length;
+    arr.forEach((v, i) => {
+      const h = (v / N) * (H - 12) + 4;
+      if      (highlights[i] === 'a') ctx.fillStyle = '#c8b97a';
+      else if (highlights[i] === 'b') ctx.fillStyle = '#e8e6e0';
+      else if (highlights[i] === 'd') ctx.fillStyle = 'rgba(200,185,122,0.3)';
+      else ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.beginPath();
+      ctx.roundRect(i * bw + 1, H - h, Math.max(bw - 2, 1), h, 2);
+      ctx.fill();
+    });
+  }
+
+  function updateInfo(status) {
+    document.getElementById('sort-comps').textContent = comps.toLocaleString();
+    document.getElementById('sort-swaps').textContent = swaps.toLocaleString();
+    document.getElementById('sort-algo').textContent  = LABELS[algo];
+    if (status) document.getElementById('sort-status').textContent = status;
+  }
+
+  function spd() { return Math.round(400 / +document.getElementById('sort-speed').value); }
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function bubbleSort() {
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arr.length - i - 1; j++) {
+        if (!running) return;
+        highlights = {[j]:'a', [j+1]:'b'};
+        comps++; updateInfo('Running...'); draw();
+        await delay(spd());
+        if (arr[j] > arr[j+1]) { [arr[j], arr[j+1]] = [arr[j+1], arr[j]]; swaps++; }
+      }
+      highlights[arr.length - i - 1] = 'd';
+    }
+  }
+
+  async function selectionSort() {
+    for (let i = 0; i < arr.length; i++) {
+      if (!running) return;
+      let mi = i;
+      for (let j = i + 1; j < arr.length; j++) {
+        if (!running) return;
+        highlights = {[mi]:'a', [j]:'b'};
+        comps++; updateInfo('Running...'); draw();
+        await delay(spd());
+        if (arr[j] < arr[mi]) mi = j;
+      }
+      if (mi !== i) { [arr[i], arr[mi]] = [arr[mi], arr[i]]; swaps++; }
+      highlights[i] = 'd';
+    }
+  }
+
+  async function insertionSort() {
+    for (let i = 1; i < arr.length; i++) {
+      if (!running) return;
+      let j = i;
+      while (j > 0 && arr[j-1] > arr[j]) {
+        if (!running) return;
+        highlights = {[j]:'a', [j-1]:'b'};
+        comps++; swaps++; updateInfo('Running...'); draw();
+        await delay(spd());
+        [arr[j], arr[j-1]] = [arr[j-1], arr[j]]; j--;
+      }
+    }
+  }
+
+  async function mergeSort(l = 0, r = arr.length - 1) {
+    if (!running || l >= r) return;
+    const m = Math.floor((l + r) / 2);
+    await mergeSort(l, m);
+    await mergeSort(m + 1, r);
+    const left = arr.slice(l, m + 1), right = arr.slice(m + 1, r + 1);
+    let i = 0, j = 0, k = l;
+    while (i < left.length && j < right.length) {
+      if (!running) return;
+      highlights = {[k]:'a'};
+      comps++; updateInfo('Running...'); draw();
+      await delay(spd());
+      if (left[i] <= right[j]) arr[k++] = left[i++];
+      else { arr[k++] = right[j++]; swaps++; }
+    }
+    while (i < left.length) arr[k++] = left[i++];
+    while (j < right.length) arr[k++] = right[j++];
+  }
+
+  function setDisabled(state) {
+    ['btn-bubble','btn-selection','btn-insertion','btn-merge','btn-shuffle','btn-run','arr-size']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.disabled = state; });
+  }
+
+  async function run() {
+    if (running) return;
+    running = true; comps = 0; swaps = 0; highlights = {};
+    setDisabled(true);
+    if      (algo === 'bubble')    await bubbleSort();
+    else if (algo === 'selection') await selectionSort();
+    else if (algo === 'insertion') await insertionSort();
+    else if (algo === 'merge')     await mergeSort();
+    highlights = {}; draw();
+    running = false;
+    setDisabled(false);
+    updateInfo('Done ✓');
+  }
+
+  document.querySelectorAll('.btn[data-algo]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (running) return;
+      algo = btn.dataset.algo;
+      document.querySelectorAll('.btn[data-algo]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateInfo(null);
+    });
+  });
+  document.getElementById('btn-shuffle').addEventListener('click', shuffle);
+  document.getElementById('btn-run').addEventListener('click', run);
+  document.getElementById('arr-size').addEventListener('input', e => {
+    document.getElementById('size-label').textContent = e.target.value;
+    shuffle();
+  });
+
+  window.addEventListener('resize', resize);
+  shuffle();
+  setTimeout(resize, 50);
+})();
+</script>
+</body>
+</html>
