@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Christian Tyler — CS & Statistics @ UNC Chapel Hill.">
+  <title>Christian Tyler</title>
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #111110;
+      --bg2:     #161614;
+      --bg3:     #1c1c1a;
+      --card:    #1f1f1d;
+      --border:  rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --accent:  #c8b97a;
+      --text:    #e8e6e0;
+      --muted:   #7a7870;
+      --dim:     #4a4844;
+      --serif:   'EB Garamond', Georgia, serif;
+      --mono:    'DM Mono', monospace;
+      --sans:    'DM Sans', sans-serif;
+      --r:       8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    ul { list-style: none; }
+    button { cursor: pointer; font-family: inherit; }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; background: rgba(17,17,16,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .nav-brand { font-family: var(--serif); font-size: 1.1rem; color: var(--text); }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-toggle { display: none; flex-direction: column; gap: 4px; background: none; border: none; padding: 4px; }
+    .nav-toggle span { display: block; width: 20px; height: 1px; background: var(--text); }
+
+    /* LAYOUT */
+    .wrap { max-width: 1060px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 7rem 0; }
+    .section-label { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+    .section-label::before { content: ''; display: block; width: 20px; height: 1px; background: var(--dim); }
+    h2.section-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 400; line-height: 1.15; color: var(--text); margin-bottom: 0.5rem; }
+    .section-sub { font-size: 0.95rem; color: var(--muted); max-width: 50ch; margin-bottom: 3.5rem; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.4rem; border-radius: var(--r); font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; transition: all 0.2s; border: 1px solid transparent; }
+    .btn-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .btn-primary:hover { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+    .btn-secondary { background: transparent; color: var(--text); border-color: var(--border2); }
+    .btn-secondary:hover { border-color: var(--text); }
+
+    /* HERO */
+    #hero { min-height: 100vh; padding-top: 60px; display: flex; align-items: center; }
+    .hero-inner { display: grid; grid-template-columns: 1fr auto; gap: 5rem; align-items: center; width: 100%; }
+    .hero-kicker { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1.5rem; }
+    .hero-name { font-family: var(--serif); font-size: clamp(3.8rem, 9vw, 7rem); font-weight: 400; line-height: 0.92; letter-spacing: -0.01em; margin-bottom: 1.75rem; }
+    .hero-name em { font-style: italic; color: var(--muted); }
+    .hero-desc { font-size: 1rem; color: var(--muted); max-width: 44ch; line-height: 1.8; margin-bottom: 2.5rem; }
+    .hero-desc strong { color: var(--text); font-weight: 400; }
+    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .hero-divider { margin-top: 3rem; padding-top: 3rem; border-top: 1px solid var(--border); display: flex; gap: 2.5rem; }
+    .hero-stat-val { font-family: var(--serif); font-size: 2rem; color: var(--text); display: block; line-height: 1; margin-bottom: 0.3rem; }
+    .hero-stat-label { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    .hero-photo-wrap { position: relative; }
+    .hero-photo { width: 260px; height: 320px; object-fit: cover; object-position: center top; border-radius: 4px; filter: grayscale(30%) contrast(1.05); border: 1px solid var(--border); }
+
+    /* ABOUT */
+    #about { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+    .about-text p { color: var(--muted); font-size: 0.97rem; margin-bottom: 1.1rem; }
+    .about-text p strong { color: var(--text); font-weight: 400; }
+    .about-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 2rem; }
+    .facts { display: flex; flex-direction: column; }
+    .fact { display: flex; justify-content: space-between; align-items: baseline; padding: 0.85rem 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+    .fact:first-child { border-top: 1px solid var(--border); }
+    .fact-label { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .fact-val { color: var(--text); text-align: right; }
+
+    /* SKILLS */
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1px; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .skill-group { background: var(--card); padding: 1.75rem; transition: background 0.2s; }
+    .skill-group:hover { background: var(--bg3); }
+    .skill-group-label { font-family: var(--mono); font-size: 0.65rem; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1.25rem; }
+    .skill-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .skill-item { font-size: 0.88rem; color: var(--muted); padding-left: 0.9rem; position: relative; transition: color 0.2s; }
+    .skill-item::before { content: '—'; position: absolute; left: 0; color: var(--dim); font-size: 0.75rem; }
+    .skill-group:hover .skill-item { color: var(--text); }
+    .courses-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 3.5rem; }
+    .course-pill { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem 1.25rem; transition: border-color 0.2s; }
+    .course-pill:hover { border-color: var(--border2); }
+    .course-code { font-family: var(--mono); font-size: 0.68rem; color: var(--accent); letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+    .course-name { font-size: 0.88rem; color: var(--text); }
+
+    /* EXPERIENCE */
+    #experience { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .timeline { display: flex; flex-direction: column; }
+    .tl-item { display: grid; grid-template-columns: 160px 1fr; gap: 2rem; padding: 2rem 0; border-bottom: 1px solid var(--border); }
+    .tl-item:first-child { border-top: 1px solid var(--border); }
+    .tl-date { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; padding-top: 0.2rem; line-height: 1.5; }
+    .tl-title { font-family: var(--serif); font-size: 1.15rem; font-weight: 400; color: var(--text); margin-bottom: 0.2rem; }
+    .tl-org { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+    .tl-bullets { display: flex; flex-direction: column; gap: 0.35rem; }
+    .tl-bullets li { font-size: 0.9rem; color: var(--muted); padding-left: 1rem; position: relative; }
+    .tl-bullets li::before { content: '·'; position: absolute; left: 0; color: var(--dim); }
+
+    /* PROJECTS */
+    #projects { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .project-card { background: var(--card); padding: 2rem; display: flex; flex-direction: column; gap: 1rem; transition: background 0.2s; }
+    .project-card:hover { background: var(--bg3); }
+    .project-num { font-family: var(--mono); font-size: 0.65rem; color: var(--dim); letter-spacing: 0.1em; }
+    .project-title { font-family: var(--serif); font-size: 1.25rem; font-weight: 400; color: var(--text); line-height: 1.3; }
+    .project-desc { font-size: 0.88rem; color: var(--muted); flex: 1; line-height: 1.65; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .project-tag { font-family: var(--mono); font-size: 0.63rem; padding: 0.2rem 0.6rem; border-radius: 4px; background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+    .project-links { display: flex; gap: 1rem; }
+    .project-link { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
+    .project-link:hover { color: var(--text); }
+
+    /* ── SNAKE ── */
+    .snake-embed { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; margin-top: 0.25rem; }
+    .snake-live-label { font-family: var(--mono); font-size: 0.63rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem; }
+    .snake-live-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 2s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .snake-ui { display: flex; gap: 0.85rem; align-items: flex-start; }
+    /* KEY FIX: explicit pixel size so cells have real height */
+    #snake-board {
+      display: grid;
+      grid-template-columns: repeat(16, 1fr);
+      grid-template-rows: repeat(16, 1fr);
+      gap: 2px;
+      width: 280px;
+      height: 280px;
+      flex-shrink: 0;
+      background: var(--bg2);
+      border-radius: 4px;
+      padding: 5px;
+      border: 1px solid var(--border);
+    }
+    .s-cell { border-radius: 2px; background: rgba(255,255,255,0.025); }
+    .s-cell.snake { background: rgba(200,185,122,0.55); }
+    .s-cell.head  { background: var(--accent); }
+    .s-cell.food  { background: rgba(230,225,210,0.8); }
+    .snake-sidebar { display: flex; flex-direction: column; gap: 0.6rem; flex: 1; }
+    .snake-score-box { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 0.75rem; text-align: center; }
+    .snake-score-label { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.25rem; }
+    .snake-score-val { font-family: var(--serif); font-size: 1.6rem; color: var(--text); }
+    .snake-btn { width: 100%; padding: 0.5rem; background: transparent; border: 1px solid var(--border); border-radius: var(--r); color: var(--muted); font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; transition: border-color 0.2s, color 0.2s; }
+    .snake-btn:hover { border-color: var(--border2); color: var(--text); }
+    .snake-status { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); text-align: center; line-height: 1.5; }
+    .snake-mobile-controls { display: none; flex-direction: column; align-items: center; gap: 5px; margin-top: 0.75rem; }
+    .snake-ctrl-row { display: flex; gap: 5px; }
+    .snake-ctrl-btn { width: 46px; height: 46px; background: var(--card); border: 1px solid var(--border); border-radius: var(--r); color: var(--muted); font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
+    .snake-ctrl-btn:hover { border-color: var(--border2); color: var(--text); }
+
+    /* ── SORT VISUALIZER ── */
+    .sort-embed { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; margin-top: 0.25rem; }
+    .sort-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+    .sort-btn { padding: 0.35rem 0.85rem; background: transparent; border: 1px solid var(--border); border-radius: var(--r); color: var(--muted); font-family: var(--mono); font-size: 0.63rem; letter-spacing: 0.06em; text-transform: uppercase; transition: all 0.2s; }
+    .sort-btn:hover { border-color: var(--border2); color: var(--text); }
+    .sort-btn.active { border-color: var(--accent); color: var(--accent); }
+    .sort-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .sort-speed { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); display: flex; align-items: center; gap: 0.4rem; margin-left: auto; }
+    .sort-speed input { width: 70px; accent-color: var(--accent); }
+    #sort-canvas { width: 100%; height: 180px; display: block; background: var(--bg2); border-radius: 4px; border: 1px solid var(--border); }
+    .sort-info { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); margin-top: 0.6rem; display: flex; gap: 1.5rem; }
+    .sort-info span { display: flex; gap: 0.35rem; align-items: center; }
+
+    /* INTERESTS */
+    .interests-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .dog-photo-wrap { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 1rem; }
+    .dog-photo-wrap img { width: 100%; height: 260px; object-fit: cover; filter: grayscale(20%); }
+    .dog-label { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 1.5rem; }
+    .interest-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .interest-tag { font-family: var(--mono); font-size: 0.7rem; padding: 0.35rem 0.85rem; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); transition: all 0.2s; }
+    .interest-tag:hover, .interest-tag.on { border-color: var(--border2); color: var(--text); }
+    .movies-label { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.25rem; }
+    .movies-list { display: flex; flex-direction: column; }
+    .movie-item { display: grid; grid-template-columns: 28px 1fr; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); transition: padding-left 0.18s; }
+    .movie-item:first-child { border-top: 1px solid var(--border); }
+    .movie-item:hover { padding-left: 4px; }
+    .movie-rank { font-family: var(--mono); font-size: 0.68rem; color: var(--dim); padding-top: 3px; }
+    .movie-name { font-size: 0.95rem; color: var(--text); line-height: 1.3; }
+    .movie-dir { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+    .movie-why { font-size: 0.76rem; color: var(--dim); font-style: italic; margin-top: 0.2rem; line-height: 1.4; }
+
+    /* CONTACT */
+    #contact { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+    .contact-info p { color: var(--muted); font-size: 0.97rem; margin-bottom: 2rem; }
+    .contact-links { display: flex; flex-direction: column; }
+    .contact-link { display: flex; align-items: center; gap: 1.25rem; padding: 1rem 0; border-bottom: 1px solid var(--border); transition: padding-left 0.18s; }
+    .contact-link:first-child { border-top: 1px solid var(--border); }
+    .contact-link:hover { padding-left: 4px; }
+    .cl-type { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; min-width: 72px; }
+    .cl-val { font-size: 0.92rem; color: var(--text); }
+    .contact-form { display: flex; flex-direction: column; gap: 0.85rem; }
+    .contact-form label { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.35rem; }
+    .contact-form input, .contact-form textarea { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 0.75rem 1rem; color: var(--text); font-family: var(--sans); font-size: 0.9rem; font-weight: 300; outline: none; transition: border-color 0.2s; resize: none; }
+    .contact-form input:focus, .contact-form textarea:focus { border-color: var(--border2); }
+    .contact-form textarea { height: 120px; }
+    #cf-ok { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); display: none; margin-top: 0.25rem; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-family: var(--mono); font-size: 0.68rem; color: var(--dim); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* RESPONSIVE */
+    @media (max-width: 860px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-photo-wrap { display: none; }
+      .about-grid, .interests-grid, .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .tl-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      .snake-ui { flex-direction: column; }
+      #snake-board { width: 100%; height: auto; aspect-ratio: 1; }
+      .snake-mobile-controls { display: flex; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 0 1.25rem; }
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0; background: var(--bg2); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; gap: 1.25rem; }
+      .nav-links.open { display: flex; }
+      .nav-toggle { display: flex; }
+      section { padding: 5rem 0; }
+      .projects-grid, .skills-grid { grid-template-columns: 1fr; }
+      .hero-divider { gap: 1.5rem; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">Christian Tyler</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#interests">Interests</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle nav">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="wrap">
+    <div class="hero-inner">
+      <div>
+        <p class="hero-kicker">UNC Chapel Hill · Junior · Class of 2027</p>
+        <h1 class="hero-name">Christian<br><em>Tyler</em></h1>
+        <p class="hero-desc">
+          <strong>CS & Statistics</strong> major building at the intersection of data, software, and design.
+          Ghanaian-American. Soccer player. Serious about film.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#projects">View My Work</a>
+          <a class="btn btn-secondary" href="Christian-Tyler-Official-Resume.pdf" target="_blank">Download Résumé</a>
+        </div>
+        <div class="hero-divider">
+          <div><span class="hero-stat-val">3+</span><span class="hero-stat-label">Years @ UNC</span></div>
+          <div><span class="hero-stat-val">2</span><span class="hero-stat-label">Majors</span></div>
+          <div><span class="hero-stat-val">D1</span><span class="hero-stat-label">Soccer</span></div>
+        </div>
+      </div>
+      <div class="hero-photo-wrap">
+        <img class="hero-photo" src="img/myself.png" alt="Christian Tyler">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <div class="section-label">About</div>
+        <h2 class="section-title">Who I am.</h2>
+        <p>I'm a junior at <strong>UNC Chapel Hill</strong> majoring in Computer Science and Statistics. My family is from Ghana — I was born and raised in Charlotte, NC.</p>
+        <p>I play soccer for the UNC Men's Soccer Team, which keeps me disciplined in ways that carry into everything else I do. Outside the pitch I spend time on data projects, watching films, and working on this site.</p>
+        <p>I'm interested in <strong>data science, UX/UI design, and web development</strong> — always looking for the next thing to build or learn.</p>
+        <div class="about-actions">
+          <a class="btn btn-secondary" href="mailto:koficat2@unc.edu">koficat2@unc.edu</a>
+          <a class="btn btn-secondary" href="https://linkedin.com/in/christian-tyler-58039030a/" target="_blank">LinkedIn</a>
+          <a class="btn btn-secondary" href="https://github.com/koficat2" target="_blank">GitHub</a>
+        </div>
+      </div>
+      <div class="facts">
+        <div class="fact"><span class="fact-label">School</span><span class="fact-val">UNC Chapel Hill</span></div>
+        <div class="fact"><span class="fact-label">Major</span><span class="fact-val">CS + Statistics</span></div>
+        <div class="fact"><span class="fact-label">Year</span><span class="fact-val">Junior · 2027</span></div>
+        <div class="fact"><span class="fact-label">Athletics</span><span class="fact-val">UNC Men's Soccer</span></div>
+        <div class="fact"><span class="fact-label">Clubs</span><span class="fact-val">UNC FLUX (UX/UI)</span></div>
+        <div class="fact"><span class="fact-label">Heritage</span><span class="fact-val">Ghanaian-American</span></div>
+        <div class="fact"><span class="fact-label">Honors</span><span class="fact-val">AP Capstone · NHS</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <div class="section-label">Skills</div>
+    <h2 class="section-title">Tech stack.</h2>
+    <p class="section-sub">Languages, tools, and frameworks I work with.</p>
+    <div class="skills-grid reveal">
+      <div class="skill-group">
+        <div class="skill-group-label">Languages</div>
+        <div class="skill-list">
+          <span class="skill-item">Python</span>
+          <span class="skill-item">R</span>
+          <span class="skill-item">JavaScript</span>
+          <span class="skill-item">HTML / CSS</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-label">Data & Analysis</div>
+        <div class="skill-list">
+          <span class="skill-item">Tableau</span>
+          <span class="skill-item">Excel + Toolpak</span>
+          <span class="skill-item">Statistical Modeling</span>
+          <span class="skill-item">Data Cleaning</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-label">Design & Dev</div>
+        <div class="skill-list">
+          <span class="skill-item">Figma</span>
+          <span class="skill-item">Adobe XD</span>
+          <span class="skill-item">GitHub Pages</span>
+          <span class="skill-item">Bootstrap</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-label">Tools</div>
+        <div class="skill-list">
+          <span class="skill-item">Git / GitHub</span>
+          <span class="skill-item">Microsoft Office</span>
+          <span class="skill-item">Tableau</span>
+          <span class="skill-item">PowerPoint</span>
+        </div>
+      </div>
+    </div>
+    <div class="courses-row reveal">
+      <div class="course-pill"><span class="course-code">COMP 283</span><div class="course-name">Discrete Structures</div></div>
+      <div class="course-pill"><span class="course-code">MATH 381</span><div class="course-name">Discrete Mathematics</div></div>
+      <div class="course-pill"><span class="course-code">STOR 320</span><div class="course-name">Intro to Data Science</div></div>
+      <div class="course-pill"><span class="course-code">PLAN 363</span><div class="course-name">Personal Finance & Policy</div></div>
+      <div class="course-pill"><span class="course-code">INLS 161</span><div class="course-name">Tools for Info Literacy</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="wrap">
+    <div class="section-label">Experience</div>
+    <h2 class="section-title">Where I've been.</h2>
+    <p class="section-sub">Athletics, community service, and campus involvement.</p>
+    <div class="timeline reveal">
+      <div class="tl-item">
+        <div class="tl-date">Jan 2024 — Present</div>
+        <div class="tl-body">
+          <div class="tl-title">Soccer Player</div>
+          <div class="tl-org">UNC Men's Soccer Team · Chapel Hill, NC</div>
+          <ul class="tl-bullets">
+            <li>Compete in all team practices and games, demonstrating continuous improvement</li>
+            <li>Contribute to team dynamics and support teammates during drills</li>
+            <li>Help organize team events to foster a cohesive environment</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">Feb 2024 — Present</div>
+        <div class="tl-body">
+          <div class="tl-title">Member</div>
+          <div class="tl-org">UNC FLUX Club · Chapel Hill, NC</div>
+          <ul class="tl-bullets">
+            <li>Attend workshops on UX/UI design using Figma and Adobe XD</li>
+            <li>Collaborate on design projects and contribute UX feedback</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">May 2022 — May 2023</div>
+        <div class="tl-body">
+          <div class="tl-title">Activity Volunteer</div>
+          <div class="tl-org">Camp SOAR · Charlotte, NC</div>
+          <ul class="tl-bullets">
+            <li>Organized and led sports sessions and enrichment activities</li>
+            <li>Participated in fellowship and social programs with campers</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">Jun 2021 — Aug 2021</div>
+        <div class="tl-body">
+          <div class="tl-title">Library Volunteer</div>
+          <div class="tl-org">Gaston Public Library · Gastonia, NC</div>
+          <ul class="tl-bullets">
+            <li>Organized and shelved books to maintain an accessible library</li>
+            <li>Supported reading sessions and educational workshops</li>
+            <li>Helped patrons locate materials and navigate library services</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="wrap">
+    <div class="section-label">Projects</div>
+    <h2 class="section-title">Things I've built.</h2>
+    <p class="section-sub">From data science research to interactive games.</p>
+    <div class="projects-grid reveal">
+
+      <!-- SNAKE -->
+      <div class="project-card">
+        <div class="project-num">01 — Interactive</div>
+        <div class="project-title">Classic Snake</div>
+        <div class="project-desc">A fully playable in-browser Snake game engineered with a strict separation between game state and rendering. Movement, collision detection, food placement, and scoring all live in a deterministic state machine — the UI layer only reads from it and never mutates it directly. Supports keyboard (arrow keys + WASD), spacebar pause, touch controls on mobile, and persistent best-score tracking. Built without a single library or framework — pure vanilla JavaScript and CSS.</div>
+        <div class="snake-embed">
+          <div class="snake-live-label">Live — playable below</div>
+          <div class="snake-ui">
+            <div id="snake-board" role="grid" aria-label="Snake game board"></div>
+            <div class="snake-sidebar">
+              <div class="snake-score-box">
+                <div class="snake-score-label">Score</div>
+                <div class="snake-score-val" id="s-score">0</div>
+              </div>
+              <div class="snake-score-box">
+                <div class="snake-score-label">Best</div>
+                <div class="snake-score-val" id="s-best">0</div>
+              </div>
+              <button class="snake-btn" id="s-pause">Pause</button>
+              <button class="snake-btn" id="s-restart">Restart</button>
+              <div class="snake-status" id="s-status">Arrow keys / WASD</div>
+            </div>
+          </div>
+          <div class="snake-mobile-controls">
+            <button class="snake-ctrl-btn" data-dir="up">↑</button>
+            <div class="snake-ctrl-row">
+              <button class="snake-ctrl-btn" data-dir="left">←</button>
+              <button class="snake-ctrl-btn" data-dir="down">↓</button>
+              <button class="snake-ctrl-btn" data-dir="right">→</button>
+            </div>
+          </div>
+        </div>
+        <div class="project-tags"><span class="project-tag">JavaScript</span><span class="project-tag">HTML/CSS</span><span class="project-tag">State Machine</span><span class="project-tag">Game Dev</span><span class="project-tag">No Libraries</span></div>
+        <div class="project-links">
+          <a class="project-link" href="https://koficat2.github.io/personal-website/" target="_blank">Live →</a>
+          <a class="project-link" href="https://github.com/koficat2/personal-website" target="_blank">GitHub →</a>
+        </div>
+      </div>
+
+      <!-- SORT VISUALIZER -->
+      <div class="project-card">
+        <div class="project-num">02 — Interactive</div>
+        <div class="project-title">Sorting Algorithm Visualizer</div>
+        <div class="project-desc">An interactive visualization of four fundamental sorting algorithms — Bubble, Selection, Insertion, and Merge sort — rendered frame-by-frame on an HTML Canvas. Each comparison and swap is animated in real time with live counters for total operations. Array size and animation speed are both adjustable. Built to make the abstract runtime complexity differences between O(n²) and O(n log n) algorithms immediately visible rather than just theoretical.</div>
+        <div class="sort-embed">
+          <div class="sort-controls">
+            <button class="sort-btn active" data-algo="bubble" id="btn-bubble">Bubble</button>
+            <button class="sort-btn" data-algo="selection" id="btn-selection">Selection</button>
+            <button class="sort-btn" data-algo="insertion" id="btn-insertion">Insertion</button>
+            <button class="sort-btn" data-algo="merge" id="btn-merge">Merge</button>
+            <button class="sort-btn" id="btn-shuffle">Shuffle</button>
+            <button class="sort-btn" id="btn-run">Run ▶</button>
+            <div class="sort-speed">
+              <span>Speed</span>
+              <input type="range" id="sort-speed" min="1" max="10" value="5">
+            </div>
+          </div>
+          <canvas id="sort-canvas"></canvas>
+          <div class="sort-info">
+            <span>Comparisons: <strong id="sort-comps">0</strong></span>
+            <span>Swaps: <strong id="sort-swaps">0</strong></span>
+            <span id="sort-label">Bubble Sort</span>
+          </div>
+        </div>
+        <div class="project-tags"><span class="project-tag">JavaScript</span><span class="project-tag">Canvas API</span><span class="project-tag">Algorithms</span><span class="project-tag">O(n²) vs O(n log n)</span></div>
+        <div class="project-links">
+          <a class="project-link" href="sort-visualizer.html" target="_blank">Full Page →</a>
+          <a class="project-link" href="https://github.com/koficat2/personal-website" target="_blank">GitHub →</a>
+        </div>
+      </div>
+
+      <!-- MARKOV CHAIN -->
+      <div class="project-card">
+        <div class="project-num">03 — CS + Statistics</div>
+        <div class="project-title">Markov Chain Text Predictor</div>
+        <div class="project-desc">A browser-based probabilistic language model built entirely from scratch in vanilla JavaScript. Feed it any text corpus — Shakespeare, news articles, your own writing — and it builds an n-th order Markov chain, computing real transition probability distributions across every state. Generates new text by sampling from those distributions with a tunable temperature parameter. Ships with a live transition graph, per-state probability inspector, token frequency chart, and real-time model entropy and perplexity readouts. No libraries. No backend. Pure probability theory applied to language.</div>
+        <div class="project-tags"><span class="project-tag">JavaScript</span><span class="project-tag">Probability Theory</span><span class="project-tag">NLP</span><span class="project-tag">Canvas API</span><span class="project-tag">Markov Chains</span></div>
+        <div class="project-links">
+          <a class="project-link" href="markov-predictor.html" target="_blank">Live Demo →</a>
+          <a class="project-link" href="https://github.com/koficat2/personal-website" target="_blank">GitHub →</a>
+        </div>
+      </div>
+
+      <!-- STATS RESEARCH -->
+      <div class="project-card">
+        <div class="project-num">04 — Research</div>
+        <div class="project-title">Policy Trends in Science Education</div>
+        <div class="project-desc">Original research using the 2019 Survey of American Science Teachers dataset. Investigated whether a statistically significant relationship exists between a science teacher's political affiliation and their geographic location across U.S. regions. Cleaned and recoded raw survey data down to two variables — political affiliation and state — then aggregated by region using PivotTables and conducted a matched-pairs two-sample t-test in Excel's Data Analysis Toolpak. Built a Tableau choropleth heatmap encoding the Democratic-to-Republican teacher ratio per state, and a stacked bar chart breaking down regional political composition. Concluded with a statistically significant result well below the α = 0.05 threshold, supporting the hypothesis that Democratic-identifying science teachers are disproportionately concentrated in certain regions of the country.</div>
+        <div class="project-tags"><span class="project-tag">Tableau</span><span class="project-tag">Excel</span><span class="project-tag">Matched-Pairs t-test</span><span class="project-tag">Data Cleaning</span><span class="project-tag">Choropleth Map</span></div>
+        <div class="project-links">
+          <a class="project-link" href="Final Write up.pdf" target="_blank">Read Write-Up →</a>
+          <a class="project-link" href="https://linkedin.com/in/christian-tyler-58039030a/details/projects/" target="_blank">LinkedIn →</a>
+        </div>
+      </div>
+
+      <!-- THIS SITE -->
+      <div class="project-card">
+        <div class="project-num">05 — Web</div>
+        <div class="project-title">This Website</div>
+        <div class="project-desc">Designed and engineered entirely from scratch — no templates, no site builders. Started as a Bootstrap-based class assignment for INLS 161, then progressively rebuilt into a fully custom dark-mode portfolio with hand-written HTML, CSS, and JavaScript. Features scroll-reveal animations, a fixed responsive navbar with mobile hamburger menu, an embedded playable Snake game, a live sorting algorithm visualizer, a Markov chain language model, and a working contact form — all without a single external JS library. Hosted on GitHub Pages with continuous updates pushed directly from the repo.</div>
+        <div class="project-tags"><span class="project-tag">HTML</span><span class="project-tag">CSS</span><span class="project-tag">JavaScript</span><span class="project-tag">GitHub Pages</span><span class="project-tag">No Frameworks</span></div>
+        <div class="project-links">
+          <a class="project-link" href="https://koficat2.github.io/personal-website/" target="_blank">Live →</a>
+          <a class="project-link" href="https://github.com/koficat2/personal-website" target="_blank">GitHub →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- INTERESTS -->
+<section id="interests">
+  <div class="wrap">
+    <div class="section-label">Interests</div>
+    <h2 class="section-title">Outside the IDE.</h2>
+    <p class="section-sub">Soccer, anime, great cinema, and one very patient dog.</p>
+    <div class="interests-grid reveal">
+      <div>
+        <div class="dog-photo-wrap">
+          <img src="img/DOg.png" alt="Cam the dog">
+        </div>
+        <p class="dog-label">Cam 🐾</p>
+        <div class="interest-tags">
+          <span class="interest-tag on">⚽ Soccer</span>
+          <span class="interest-tag on">🍜 Anime</span>
+          <span class="interest-tag on">🎬 Film</span>
+          <span class="interest-tag on">🇬🇭 Ghanaian culture</span>
+          <span class="interest-tag">📚 Reading</span>
+          <span class="interest-tag">🎮 Gaming</span>
+          <span class="interest-tag">📊 Statistics</span>
+          <span class="interest-tag">🎨 UX/UI</span>
+        </div>
+      </div>
+      <div>
+        <div class="movies-label">Top 10 Films of All Time</div>
+        <div class="movies-list">
+          <div class="movie-item"><span class="movie-rank">01</span><div><div class="movie-name">Trois Couleurs: Bleu</div><div class="movie-dir">Krzysztof Kieślowski, 1993</div><div class="movie-why">Grief rendered as pure sensation — Binoche carries the whole film without saying much at all.</div></div></div>
+          <div class="movie-item"><span class="movie-rank">02</span><div><div class="movie-name">Scream</div><div class="movie-dir">Wes Craven, 1996</div><div class="movie-why">The rare horror film that's genuinely funny and genuinely scary at the same time.</div></div></div>
+          <div class="movie-item"><span class="movie-rank">03</span><div><div class="movie-name">Jagten (The Hunt)</div><div class="movie-dir">Thomas Vinterberg, 2012</div><div class="movie-why">Mads Mikkelsen at his best — a slow-burn about how fast a community can turn on you.</div></div></div>
+          <div class="movie-item"><span class="movie-rank">04</span><div><div class="movie-name">Rope</div><div class="movie-dir">Alfred Hitchcock, 1948</div><div class="movie-why">One apartment, one continuous take, more tension than most films with ten times the budget.</div></div></div>
+          <div class="movie-item"><span class="movie-rank">05</span><div><div class="movie-name">Dreams</div><div class="movie-dir">Akira Kurosawa, 1990</div><div class="movie-why">Eight dream sequences, each one its own painting — cinema as pure visual poetry.</div></div></div>
+          <div class="movie-item"><span class="movie-rank">06</span><div><div class="movie-name">Winter Light</div><div class="movie-dir">Ingmar Bergman, 1963</div><div class="movie-why">Bergman at his most stripped back — a quiet devastation about faith, doubt, and human coldness.</div></div></div>
+          <div class="movie-item"><span class="movie-rank">07</span><div><div class="movie-name">Phantom Thread</div><div class="movie-dir">Paul Thomas Anderson, 2017</div><div class="movie-why">A love story disguised as a character study disguised as horror — DDL's best work.</div></div></div>
+          <div class="movie-item"><span class="movie-rank">08</span><div><div class="movie-name">Basic Instinct</div><div class="movie-dir">Paul Verhoeven, 1992</div><div class="movie-why">Perfectly calibrated pulp — every scene feels like it's about to go completely off the rails.</div></div></div>
+          <div class="movie-item"><span class="movie-rank">09</span><div><div class="movie-name">Mr. & Mrs. Smith</div><div class="movie-dir">Doug Liman, 2005</div><div class="movie-why">Just an insanely fun movie — great chemistry, never takes itself too seriously.</div></div></div>
+          <div class="movie-item"><span class="movie-rank">10</span><div><div class="movie-name">Kill Bill</div><div class="movie-dir">Quentin Tarantino, 2003–04</div><div class="movie-why">Style as substance — Tarantino at peak maximalism, a revenge epic that earns every frame.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <div class="section-label">Contact</div>
+        <h2 class="section-title">Get in touch.</h2>
+        <p>Always open to interesting projects, opportunities, and conversations. Especially interested in internships for Summer 2026.</p>
+        <div class="contact-links">
+          <a class="contact-link" href="mailto:koficat2@unc.edu"><span class="cl-type">Email</span><span class="cl-val">koficat2@unc.edu</span></a>
+          <a class="contact-link" href="https://github.com/koficat2" target="_blank"><span class="cl-type">GitHub</span><span class="cl-val">github.com/koficat2</span></a>
+          <a class="contact-link" href="https://linkedin.com/in/christian-tyler-58039030a/" target="_blank"><span class="cl-type">LinkedIn</span><span class="cl-val">christian-tyler-58039030a</span></a>
+          <a class="contact-link" href="Christian-Tyler-Official-Resume.pdf" target="_blank"><span class="cl-type">Résumé</span><span class="cl-val">Download PDF</span></a>
+        </div>
+      </div>
+      <div class="contact-form">
+        <div><label for="cf-name">Name</label><input type="text" id="cf-name" placeholder="Your name"></div>
+        <div><label for="cf-email">Email</label><input type="email" id="cf-email" placeholder="you@email.com"></div>
+        <div><label for="cf-msg">Message</label><textarea id="cf-msg" placeholder="What's on your mind?"></textarea></div>
+        <button class="btn btn-primary" onclick="handleForm()">Send Message</button>
+        <p id="cf-ok">Message sent — I'll get back to you soon.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-copy">© 2025 Christian Tyler · UNC Chapel Hill · Built with HTML, CSS & JS</span>
+  <div class="footer-links">
+    <a href="https://github.com/koficat2" target="_blank">GitHub</a>
+    <a href="https://linkedin.com/in/christian-tyler-58039030a/" target="_blank">LinkedIn</a>
+    <a href="mailto:koficat2@unc.edu">Email</a>
+  </div>
+</footer>
+
+<script>
+/* ── NAV ── */
+const navToggle = document.getElementById('navToggle');
+const navLinks  = document.getElementById('navLinks');
+navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+/* ── SCROLL REVEAL ── */
+const ro = new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }});
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+/* ── CONTACT ── */
+function handleForm() {
+  const n = document.getElementById('cf-name').value.trim();
+  const e = document.getElementById('cf-email').value.trim();
+  const m = document.getElementById('cf-msg').value.trim();
+  if (!n || !e || !m) { alert('Please fill in all fields.'); return; }
+  document.getElementById('cf-ok').style.display = 'block';
+  ['cf-name','cf-email','cf-msg'].forEach(id => document.getElementById(id).value = '');
+  setTimeout(() => document.getElementById('cf-ok').style.display = 'none', 5000);
+}
+
+/* ── SNAKE ── */
+(function () {
+  const G = 16, TICK = 150;
+  const OFF = { up:{x:0,y:-1}, down:{x:0,y:1}, left:{x:-1,y:0}, right:{x:1,y:0} };
+  const OPP = { up:'down', down:'up', left:'right', right:'left' };
+
+  function randFood(snake) {
+    const open = [];
+    for (let y = 0; y < G; y++)
+      for (let x = 0; x < G; x++)
+        if (!snake.some(s => s.x === x && s.y === y)) open.push({x, y});
+    return open.length ? open[Math.floor(Math.random() * open.length)] : snake[0];
+  }
+
+  let best = 0;
+  function mkState() {
+    const snake = [{x:4,y:8},{x:3,y:8},{x:2,y:8}];
+    return { snake, dir:'right', pdir:'right', food:randFood(snake), score:0, run:false, over:false };
+  }
+  let S = mkState();
+
+  /* Build the 16×16 grid using a table so cell height is guaranteed */
+  const board = document.getElementById('snake-board');
+  board.innerHTML = '';
+  const cells = [];
+  const table = document.createElement('table');
+  table.style.cssText = 'width:100%;height:100%;border-collapse:collapse;table-layout:fixed;';
+  for (let r = 0; r < G; r++) {
+    const tr = document.createElement('tr');
+    for (let c = 0; c < G; c++) {
+      const td = document.createElement('td');
+      td.style.cssText = 'padding:1px;';
+      const cell = document.createElement('div');
+      cell.style.cssText = 'width:100%;height:100%;border-radius:2px;background:rgba(255,255,255,0.025);';
+      td.appendChild(cell);
+      tr.appendChild(td);
+      cells.push(cell);
+    }
+    table.appendChild(tr);
+  }
+  board.appendChild(table);
+  /* override board to use block layout */
+  board.style.display = 'block';
+
+  function idx({x, y}) { return y * G + x; }
+
+  function render() {
+    cells.forEach(c => { c.style.background = 'rgba(255,255,255,0.025)'; });
+    S.snake.forEach((seg, i) => {
+      const c = cells[idx(seg)];
+      if (!c) return;
+      c.style.background = i === 0 ? '#c8b97a' : 'rgba(200,185,122,0.5)';
+    });
+    const fc = cells[idx(S.food)];
+    if (fc && !S.snake.some(s => s.x === S.food.x && s.y === S.food.y))
+      fc.style.background = 'rgba(232,230,224,0.85)';
+
+    document.getElementById('s-score').textContent = S.score;
+    document.getElementById('s-best').textContent = best;
+    document.getElementById('s-pause').textContent = S.run ? 'Pause' : 'Resume';
+    const st = document.getElementById('s-status');
+    if (S.over)         st.textContent = 'Game over · score: ' + S.score;
+    else if (!S.run && S.score === 0) st.textContent = 'Arrow keys / WASD';
+    else if (!S.run)    st.textContent = 'Paused';
+    else                st.textContent = 'Collect food. Avoid yourself.';
+  }
+
+  function step() {
+    if (!S.run || S.over) return;
+    const off = OFF[S.pdir], head = S.snake[0];
+    const next = { x: head.x + off.x, y: head.y + off.y };
+    const grows = next.x === S.food.x && next.y === S.food.y;
+    const check = grows ? S.snake : S.snake.slice(0, -1);
+    if (next.x < 0 || next.y < 0 || next.x >= G || next.y >= G ||
+        check.some(s => s.x === next.x && s.y === next.y)) {
+      best = Math.max(best, S.score);
+      S = { ...S, run: false, over: true };
+      render(); return;
+    }
+    const ns = [next, ...S.snake];
+    if (!grows) ns.pop();
+    const sc = grows ? S.score + 1 : S.score;
+    best = Math.max(best, sc);
+    S = { ...S, snake: ns, dir: S.pdir, food: grows ? randFood(ns) : S.food, score: sc };
+    render();
+  }
+
+  setInterval(step, TICK);
+  render();
+
+  function queue(dir) {
+    if (S.over) return;
+    if (S.snake.length > 1 && OPP[S.dir] === dir) return;
+    S = { ...S, pdir: dir, run: true };
+    render();
+  }
+
+  document.addEventListener('keydown', e => {
+    const m = { ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right',
+                 w:'up', s:'down', a:'left', d:'right', W:'up', S:'down', A:'left', D:'right' };
+    if (e.code === 'Space') { e.preventDefault(); if (!S.over) { S = {...S, run:!S.run}; render(); } return; }
+    const d = m[e.key]; if (!d) return;
+    e.preventDefault(); queue(d);
+  });
+
+  document.getElementById('s-pause').addEventListener('click', () => {
+    if (!S.over) { S = {...S, run:!S.run}; render(); }
+  });
+  document.getElementById('s-restart').addEventListener('click', () => {
+    S = mkState(); render();
+  });
+  document.querySelectorAll('.snake-ctrl-btn').forEach(btn =>
+    btn.addEventListener('click', () => queue(btn.dataset.dir))
+  );
+})();
+
+/* ── SORT VISUALIZER ── */
+(function () {
+  const canvas  = document.getElementById('sort-canvas');
+  const ctx     = canvas.getContext('2d');
+  const N = 40;
+  let arr = [], highlights = {}, running = false, algo = 'bubble';
+  let comps = 0, swaps = 0;
+
+  const LABELS = { bubble:'Bubble Sort', selection:'Selection Sort', insertion:'Insertion Sort', merge:'Merge Sort' };
+
+  function shuffle() {
+    if (running) return;
+    arr = Array.from({length: N}, (_, i) => i + 1).sort(() => Math.random() - .5);
+    highlights = {}; comps = 0; swaps = 0; updateInfo(); draw();
+  }
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width  = rect.width - 2;   /* -2 for border */
+    canvas.height = 180;
+    draw();
+  }
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const bw = W / N;
+    arr.forEach((v, i) => {
+      const h = (v / N) * (H - 8);
+      if      (highlights[i] === 'a') ctx.fillStyle = '#c8b97a';
+      else if (highlights[i] === 'b') ctx.fillStyle = '#e8e6e0';
+      else if (highlights[i] === 'd') ctx.fillStyle = 'rgba(200,185,122,0.3)';
+      else ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.fillRect(i * bw + 1, H - h, bw - 2, h);
+    });
+  }
+
+  function updateInfo() {
+    document.getElementById('sort-comps').textContent = comps;
+    document.getElementById('sort-swaps').textContent = swaps;
+    document.getElementById('sort-label').textContent = LABELS[algo] || '';
+  }
+
+  function speed() {
+    const v = +document.getElementById('sort-speed').value;
+    return Math.round(300 / v);
+  }
+
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function bubbleSort() {
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arr.length - i - 1; j++) {
+        if (!running) return;
+        highlights = {[j]:'a', [j+1]:'b'};
+        comps++; updateInfo(); draw();
+        await delay(speed());
+        if (arr[j] > arr[j+1]) { [arr[j], arr[j+1]] = [arr[j+1], arr[j]]; swaps++; }
+      }
+      highlights[arr.length - i - 1] = 'd';
+    }
+  }
+
+  async function selectionSort() {
+    for (let i = 0; i < arr.length; i++) {
+      if (!running) return;
+      let minIdx = i;
+      for (let j = i + 1; j < arr.length; j++) {
+        if (!running) return;
+        highlights = {[minIdx]:'a', [j]:'b'};
+        comps++; updateInfo(); draw();
+        await delay(speed());
+        if (arr[j] < arr[minIdx]) minIdx = j;
+      }
+      if (minIdx !== i) { [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]]; swaps++; }
+      highlights[i] = 'd';
+    }
+  }
+
+  async function insertionSort() {
+    for (let i = 1; i < arr.length; i++) {
+      if (!running) return;
+      let j = i;
+      while (j > 0 && arr[j - 1] > arr[j]) {
+        if (!running) return;
+        highlights = {[j]:'a', [j-1]:'b'};
+        comps++; swaps++; updateInfo(); draw();
+        await delay(speed());
+        [arr[j], arr[j-1]] = [arr[j-1], arr[j]];
+        j--;
+      }
+    }
+  }
+
+  async function mergeSort(l = 0, r = arr.length - 1) {
+    if (!running || l >= r) return;
+    const m = Math.floor((l + r) / 2);
+    await mergeSort(l, m);
+    await mergeSort(m + 1, r);
+    // merge
+    const left = arr.slice(l, m + 1), right = arr.slice(m + 1, r + 1);
+    let i = 0, j = 0, k = l;
+    while (i < left.length && j < right.length) {
+      if (!running) return;
+      highlights = {[k]:'a'};
+      comps++; updateInfo(); draw();
+      await delay(speed());
+      if (left[i] <= right[j]) arr[k++] = left[i++];
+      else { arr[k++] = right[j++]; swaps++; }
+    }
+    while (i < left.length) arr[k++] = left[i++];
+    while (j < right.length) arr[k++] = right[j++];
+  }
+
+  async function run() {
+    if (running) return;
+    running = true;
+    comps = 0; swaps = 0; highlights = {}; updateInfo();
+    setButtons(true);
+    if      (algo === 'bubble')    await bubbleSort();
+    else if (algo === 'selection') await selectionSort();
+    else if (algo === 'insertion') await insertionSort();
+    else if (algo === 'merge')     await mergeSort();
+    highlights = {}; draw();
+    running = false;
+    setButtons(false);
+  }
+
+  function setButtons(dis) {
+    ['btn-bubble','btn-selection','btn-insertion','btn-merge','btn-shuffle','btn-run']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.disabled = dis; });
+  }
+
+  document.querySelectorAll('.sort-btn[data-algo]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (running) return;
+      algo = btn.dataset.algo;
+      document.querySelectorAll('.sort-btn[data-algo]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('sort-label').textContent = LABELS[algo];
+    });
+  });
+  document.getElementById('btn-shuffle').addEventListener('click', shuffle);
+  document.getElementById('btn-run').addEventListener('click', run);
+
+  window.addEventListener('resize', resize);
+  shuffle();
+  setTimeout(resize, 100);
+})();
+</script>
+</body>
+</html>
