@@ -33,7 +33,7 @@
     img { display: block; max-width: 100%; }
     ul { list-style: none; }
     button { cursor: pointer; font-family: inherit; }
-
+ 
     /* NAV */
     nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; background: rgba(17,17,16,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
     .nav-brand { font-family: var(--serif); font-size: 1.1rem; color: var(--text); }
@@ -42,7 +42,7 @@
     .nav-links a:hover { color: var(--text); }
     .nav-toggle { display: none; flex-direction: column; gap: 4px; background: none; border: none; padding: 4px; }
     .nav-toggle span { display: block; width: 20px; height: 1px; background: var(--text); }
-
+ 
     /* LAYOUT */
     .wrap { max-width: 1060px; margin: 0 auto; padding: 0 2rem; }
     section { padding: 7rem 0; }
@@ -50,14 +50,14 @@
     .section-label::before { content: ''; display: block; width: 20px; height: 1px; background: var(--dim); }
     h2.section-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 400; line-height: 1.15; color: var(--text); margin-bottom: 0.5rem; }
     .section-sub { font-size: 0.95rem; color: var(--muted); max-width: 50ch; margin-bottom: 3.5rem; }
-
+ 
     /* BUTTONS */
     .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.4rem; border-radius: var(--r); font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; transition: all 0.2s; border: 1px solid transparent; }
     .btn-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
     .btn-primary:hover { background: var(--accent); border-color: var(--accent); color: var(--bg); }
     .btn-secondary { background: transparent; color: var(--text); border-color: var(--border2); }
     .btn-secondary:hover { border-color: var(--text); }
-
+ 
     /* HERO */
     #hero { min-height: 100vh; padding-top: 60px; display: flex; align-items: center; }
     .hero-inner { display: grid; grid-template-columns: 1fr auto; gap: 5rem; align-items: center; width: 100%; }
@@ -72,7 +72,7 @@
     .hero-stat-label { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
     .hero-photo-wrap { position: relative; }
     .hero-photo { width: 260px; height: 320px; object-fit: cover; object-position: center top; border-radius: 4px; filter: grayscale(30%) contrast(1.05); border: 1px solid var(--border); }
-
+ 
     /* ABOUT */
     #about { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
@@ -84,7 +84,7 @@
     .fact:first-child { border-top: 1px solid var(--border); }
     .fact-label { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
     .fact-val { color: var(--text); text-align: right; }
-
+ 
     /* SKILLS */
     .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1px; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
     .skill-group { background: var(--card); padding: 1.75rem; transition: background 0.2s; }
@@ -99,7 +99,7 @@
     .course-pill:hover { border-color: var(--border2); }
     .course-code { font-family: var(--mono); font-size: 0.68rem; color: var(--accent); letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
     .course-name { font-size: 0.88rem; color: var(--text); }
-
+ 
     /* EXPERIENCE */
     #experience { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .timeline { display: flex; flex-direction: column; }
@@ -111,7 +111,7 @@
     .tl-bullets { display: flex; flex-direction: column; gap: 0.35rem; }
     .tl-bullets li { font-size: 0.9rem; color: var(--muted); padding-left: 1rem; position: relative; }
     .tl-bullets li::before { content: '·'; position: absolute; left: 0; color: var(--dim); }
-
+ 
     /* PROJECTS */
     #projects { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
@@ -125,7 +125,7 @@
     .project-links { display: flex; gap: 1rem; }
     .project-link { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
     .project-link:hover { color: var(--text); }
-
+ 
     /* ── SNAKE ── */
     .snake-embed { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; margin-top: 0.25rem; }
     .snake-live-label { font-family: var(--mono); font-size: 0.63rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem; }
@@ -161,7 +161,7 @@
     .snake-ctrl-row { display: flex; gap: 5px; }
     .snake-ctrl-btn { width: 46px; height: 46px; background: var(--card); border: 1px solid var(--border); border-radius: var(--r); color: var(--muted); font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
     .snake-ctrl-btn:hover { border-color: var(--border2); color: var(--text); }
-
+ 
     /* ── SORT VISUALIZER ── */
     .sort-embed { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; margin-top: 0.25rem; }
     .sort-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
@@ -174,7 +174,7 @@
     #sort-canvas { width: 100%; height: 180px; display: block; background: var(--bg2); border-radius: 4px; border: 1px solid var(--border); }
     .sort-info { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); margin-top: 0.6rem; display: flex; gap: 1.5rem; }
     .sort-info span { display: flex; gap: 0.35rem; align-items: center; }
-
+ 
     /* INTERESTS */
     .interests-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
     .dog-photo-wrap { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 1rem; }
@@ -192,7 +192,7 @@
     .movie-name { font-size: 0.95rem; color: var(--text); line-height: 1.3; }
     .movie-dir { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
     .movie-why { font-size: 0.76rem; color: var(--dim); font-style: italic; margin-top: 0.2rem; line-height: 1.4; }
-
+ 
     /* CONTACT */
     #contact { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
@@ -209,18 +209,18 @@
     .contact-form input:focus, .contact-form textarea:focus { border-color: var(--border2); }
     .contact-form textarea { height: 120px; }
     #cf-ok { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); display: none; margin-top: 0.25rem; }
-
+ 
     /* FOOTER */
     footer { border-top: 1px solid var(--border); padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
     .footer-copy { font-family: var(--mono); font-size: 0.68rem; color: var(--dim); }
     .footer-links { display: flex; gap: 1.5rem; }
     .footer-links a { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); transition: color 0.2s; }
     .footer-links a:hover { color: var(--text); }
-
+ 
     /* REVEAL */
     .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
     .reveal.in { opacity: 1; transform: none; }
-
+ 
     /* RESPONSIVE */
     @media (max-width: 860px) {
       .hero-inner { grid-template-columns: 1fr; }
@@ -243,7 +243,7 @@
   </style>
 </head>
 <body>
-
+ 
 <!-- NAV -->
 <nav>
   <div class="nav-brand">Christian Tyler</div>
@@ -259,7 +259,7 @@
     <span></span><span></span><span></span>
   </button>
 </nav>
-
+ 
 <!-- HERO -->
 <section id="hero">
   <div class="wrap">
@@ -287,7 +287,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- ABOUT -->
 <section id="about">
   <div class="wrap">
@@ -316,7 +316,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- SKILLS -->
 <section id="skills">
   <div class="wrap">
@@ -370,7 +370,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- EXPERIENCE -->
 <section id="experience">
   <div class="wrap">
@@ -427,7 +427,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- PROJECTS -->
 <section id="projects">
   <div class="wrap">
@@ -435,7 +435,7 @@
     <h2 class="section-title">Things I've built.</h2>
     <p class="section-sub">From data science research to interactive games.</p>
     <div class="projects-grid reveal">
-
+ 
       <!-- SNAKE -->
       <div class="project-card">
         <div class="project-num">01 — Interactive</div>
@@ -474,7 +474,7 @@
           <a class="project-link" href="https://github.com/koficat2/personal-website" target="_blank">GitHub →</a>
         </div>
       </div>
-
+ 
       <!-- SORT VISUALIZER -->
       <div class="project-card">
         <div class="project-num">02 — Interactive</div>
@@ -506,7 +506,7 @@
           <a class="project-link" href="https://github.com/koficat2/personal-website" target="_blank">GitHub →</a>
         </div>
       </div>
-
+ 
       <!-- MARKOV CHAIN -->
       <div class="project-card">
         <div class="project-num">03 — CS + Statistics</div>
@@ -518,7 +518,7 @@
           <a class="project-link" href="https://github.com/koficat2/personal-website" target="_blank">GitHub →</a>
         </div>
       </div>
-
+ 
       <!-- STATS RESEARCH -->
       <div class="project-card">
         <div class="project-num">04 — Research</div>
@@ -530,7 +530,7 @@
           <a class="project-link" href="https://linkedin.com/in/christian-tyler-58039030a/details/projects/" target="_blank">LinkedIn →</a>
         </div>
       </div>
-
+ 
       <!-- THIS SITE -->
       <div class="project-card">
         <div class="project-num">05 — Web</div>
@@ -542,11 +542,11 @@
           <a class="project-link" href="https://github.com/koficat2/personal-website" target="_blank">GitHub →</a>
         </div>
       </div>
-
+ 
     </div>
   </div>
 </section>
-
+ 
 <!-- INTERESTS -->
 <section id="interests">
   <div class="wrap">
@@ -588,7 +588,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- CONTACT -->
 <section id="contact">
   <div class="wrap">
@@ -614,7 +614,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- FOOTER -->
 <footer>
   <span class="footer-copy">© 2025 Christian Tyler · UNC Chapel Hill · Built with HTML, CSS & JS</span>
@@ -624,20 +624,20 @@
     <a href="mailto:koficat2@unc.edu">Email</a>
   </div>
 </footer>
-
+ 
 <script>
 /* ── NAV ── */
 const navToggle = document.getElementById('navToggle');
 const navLinks  = document.getElementById('navLinks');
 navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
 navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
-
+ 
 /* ── SCROLL REVEAL ── */
 const ro = new IntersectionObserver(es => {
   es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }});
 }, { threshold: 0.08 });
 document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
-
+ 
 /* ── CONTACT ── */
 function handleForm() {
   const n = document.getElementById('cf-name').value.trim();
@@ -648,13 +648,13 @@ function handleForm() {
   ['cf-name','cf-email','cf-msg'].forEach(id => document.getElementById(id).value = '');
   setTimeout(() => document.getElementById('cf-ok').style.display = 'none', 5000);
 }
-
+ 
 /* ── SNAKE ── */
 (function () {
   const G = 16, TICK = 150;
   const OFF = { up:{x:0,y:-1}, down:{x:0,y:1}, left:{x:-1,y:0}, right:{x:1,y:0} };
   const OPP = { up:'down', down:'up', left:'right', right:'left' };
-
+ 
   function randFood(snake) {
     const open = [];
     for (let y = 0; y < G; y++)
@@ -662,14 +662,14 @@ function handleForm() {
         if (!snake.some(s => s.x === x && s.y === y)) open.push({x, y});
     return open.length ? open[Math.floor(Math.random() * open.length)] : snake[0];
   }
-
+ 
   let best = 0;
   function mkState() {
     const snake = [{x:4,y:8},{x:3,y:8},{x:2,y:8}];
     return { snake, dir:'right', pdir:'right', food:randFood(snake), score:0, run:false, over:false };
   }
   let S = mkState();
-
+ 
   /* Build the 16×16 grid using a table so cell height is guaranteed */
   const board = document.getElementById('snake-board');
   board.innerHTML = '';
@@ -692,9 +692,9 @@ function handleForm() {
   board.appendChild(table);
   /* override board to use block layout */
   board.style.display = 'block';
-
+ 
   function idx({x, y}) { return y * G + x; }
-
+ 
   function render() {
     cells.forEach(c => { c.style.background = 'rgba(255,255,255,0.025)'; });
     S.snake.forEach((seg, i) => {
@@ -705,7 +705,7 @@ function handleForm() {
     const fc = cells[idx(S.food)];
     if (fc && !S.snake.some(s => s.x === S.food.x && s.y === S.food.y))
       fc.style.background = 'rgba(232,230,224,0.85)';
-
+ 
     document.getElementById('s-score').textContent = S.score;
     document.getElementById('s-best').textContent = best;
     document.getElementById('s-pause').textContent = S.run ? 'Pause' : 'Resume';
@@ -715,7 +715,7 @@ function handleForm() {
     else if (!S.run)    st.textContent = 'Paused';
     else                st.textContent = 'Collect food. Avoid yourself.';
   }
-
+ 
   function step() {
     if (!S.run || S.over) return;
     const off = OFF[S.pdir], head = S.snake[0];
@@ -735,17 +735,17 @@ function handleForm() {
     S = { ...S, snake: ns, dir: S.pdir, food: grows ? randFood(ns) : S.food, score: sc };
     render();
   }
-
+ 
   setInterval(step, TICK);
   render();
-
+ 
   function queue(dir) {
     if (S.over) return;
     if (S.snake.length > 1 && OPP[S.dir] === dir) return;
     S = { ...S, pdir: dir, run: true };
     render();
   }
-
+ 
   document.addEventListener('keydown', e => {
     const m = { ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right',
                  w:'up', s:'down', a:'left', d:'right', W:'up', S:'down', A:'left', D:'right' };
@@ -753,7 +753,7 @@ function handleForm() {
     const d = m[e.key]; if (!d) return;
     e.preventDefault(); queue(d);
   });
-
+ 
   document.getElementById('s-pause').addEventListener('click', () => {
     if (!S.over) { S = {...S, run:!S.run}; render(); }
   });
@@ -764,7 +764,7 @@ function handleForm() {
     btn.addEventListener('click', () => queue(btn.dataset.dir))
   );
 })();
-
+ 
 /* ── SORT VISUALIZER ── */
 (function () {
   const canvas  = document.getElementById('sort-canvas');
@@ -772,22 +772,22 @@ function handleForm() {
   const N = 40;
   let arr = [], highlights = {}, running = false, algo = 'bubble';
   let comps = 0, swaps = 0;
-
+ 
   const LABELS = { bubble:'Bubble Sort', selection:'Selection Sort', insertion:'Insertion Sort', merge:'Merge Sort' };
-
+ 
   function shuffle() {
     if (running) return;
     arr = Array.from({length: N}, (_, i) => i + 1).sort(() => Math.random() - .5);
     highlights = {}; comps = 0; swaps = 0; updateInfo(); draw();
   }
-
+ 
   function resize() {
     const rect = canvas.parentElement.getBoundingClientRect();
     canvas.width  = rect.width - 2;   /* -2 for border */
     canvas.height = 180;
     draw();
   }
-
+ 
   function draw() {
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
@@ -801,20 +801,20 @@ function handleForm() {
       ctx.fillRect(i * bw + 1, H - h, bw - 2, h);
     });
   }
-
+ 
   function updateInfo() {
     document.getElementById('sort-comps').textContent = comps;
     document.getElementById('sort-swaps').textContent = swaps;
     document.getElementById('sort-label').textContent = LABELS[algo] || '';
   }
-
+ 
   function speed() {
     const v = +document.getElementById('sort-speed').value;
     return Math.round(300 / v);
   }
-
+ 
   function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
-
+ 
   async function bubbleSort() {
     for (let i = 0; i < arr.length; i++) {
       for (let j = 0; j < arr.length - i - 1; j++) {
@@ -827,7 +827,7 @@ function handleForm() {
       highlights[arr.length - i - 1] = 'd';
     }
   }
-
+ 
   async function selectionSort() {
     for (let i = 0; i < arr.length; i++) {
       if (!running) return;
@@ -843,7 +843,7 @@ function handleForm() {
       highlights[i] = 'd';
     }
   }
-
+ 
   async function insertionSort() {
     for (let i = 1; i < arr.length; i++) {
       if (!running) return;
@@ -858,7 +858,7 @@ function handleForm() {
       }
     }
   }
-
+ 
   async function mergeSort(l = 0, r = arr.length - 1) {
     if (!running || l >= r) return;
     const m = Math.floor((l + r) / 2);
@@ -878,7 +878,7 @@ function handleForm() {
     while (i < left.length) arr[k++] = left[i++];
     while (j < right.length) arr[k++] = right[j++];
   }
-
+ 
   async function run() {
     if (running) return;
     running = true;
@@ -892,12 +892,12 @@ function handleForm() {
     running = false;
     setButtons(false);
   }
-
+ 
   function setButtons(dis) {
     ['btn-bubble','btn-selection','btn-insertion','btn-merge','btn-shuffle','btn-run']
       .forEach(id => { const el = document.getElementById(id); if (el) el.disabled = dis; });
   }
-
+ 
   document.querySelectorAll('.sort-btn[data-algo]').forEach(btn => {
     btn.addEventListener('click', () => {
       if (running) return;
@@ -909,7 +909,7 @@ function handleForm() {
   });
   document.getElementById('btn-shuffle').addEventListener('click', shuffle);
   document.getElementById('btn-run').addEventListener('click', run);
-
+ 
   window.addEventListener('resize', resize);
   shuffle();
   setTimeout(resize, 100);
