@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markov Chain Text Predictor — Christian Tyler</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #111110;
+      --bg2:    #161614;
+      --bg3:    #1c1c1a;
+      --card:   #1f1f1d;
+      --border: rgba(255,255,255,0.07);
+      --b2:     rgba(255,255,255,0.13);
+      --accent: #c8b97a;
+      --text:   #e8e6e0;
+      --muted:  #7a7870;
+      --dim:    #4a4844;
+      --mono:   'DM Mono', monospace;
+      --sans:   'DM Sans', sans-serif;
+      --serif:  'EB Garamond', Georgia, serif;
+      --r:      8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 300; min-height: 100vh; display: flex; flex-direction: column; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; }
+    textarea, input, select { font-family: inherit; }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.1rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(17,17,16,0.95);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+    .back { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
+    .back:hover { color: var(--text); }
+    .header-center { text-align: center; }
+    .header-title { font-family: var(--serif); font-size: 1.15rem; font-weight: 400; }
+    .header-sub { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); letter-spacing: 0.08em; margin-top: 0.1rem; }
+    .header-badge { font-family: var(--mono); font-size: 0.62rem; color: var(--accent); border: 1px solid rgba(200,185,122,0.3); border-radius: 4px; padding: 0.2rem 0.55rem; letter-spacing: 0.06em; }
+
+    /* MAIN LAYOUT */
+    main { flex: 1; max-width: 1100px; width: 100%; margin: 0 auto; padding: 3rem 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+
+    /* PANELS */
+    .panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .panel-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-family: var(--mono); font-size: 0.68rem; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; }
+    .panel-body { padding: 1.5rem; }
+
+    /* FULL WIDTH */
+    .full { grid-column: 1 / -1; }
+
+    /* CORPUS SECTION */
+    .corpus-presets { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+    .preset-btn {
+      font-family: var(--mono);
+      font-size: 0.63rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      transition: all 0.18s;
+    }
+    .preset-btn:hover, .preset-btn.active { border-color: var(--accent); color: var(--accent); }
+
+    textarea.corpus-input {
+      width: 100%;
+      height: 160px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 0.85rem 1rem;
+      color: var(--text);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    textarea.corpus-input:focus { border-color: var(--b2); }
+
+    .corpus-stats { display: flex; gap: 1.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+    .cstat { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); }
+    .cstat strong { color: var(--text); }
+
+    /* CONTROLS */
+    .control-row { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .control-label { font-family: var(--mono); font-size: 0.63rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; display: flex; justify-content: space-between; }
+    .control-label span { color: var(--accent); }
+
+    input[type=range] { width: 100%; accent-color: var(--accent); }
+    select.ctl-select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 0.55rem 0.85rem;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    select.ctl-select:focus { border-color: var(--b2); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: var(--r);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+    .btn-secondary { background: transparent; color: var(--muted); border-color: var(--border); }
+    .btn-secondary:hover { border-color: var(--b2); color: var(--text); }
+    .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+    /* CHAIN VIZ */
+    .chain-wrap { overflow-x: auto; padding-bottom: 0.5rem; }
+    #chain-canvas { display: block; border-radius: 4px; }
+
+    /* OUTPUT */
+    .output-area {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem;
+      min-height: 120px;
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text);
+      position: relative;
+    }
+    .output-area .token {
+      display: inline;
+      transition: background 0.3s, color 0.3s;
+    }
+    .output-area .token.new {
+      color: var(--accent);
+    }
+    .output-placeholder { color: var(--muted); font-style: italic; font-size: 0.9rem; }
+
+    .gen-controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.85rem; }
+    .gen-label { font-family: var(--mono); font-size: 0.63rem; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; }
+
+    /* PROBABILITY TABLE */
+    .prob-table-wrap { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--r); }
+    table.prob-table { width: 100%; border-collapse: collapse; }
+    table.prob-table th { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; padding: 0.65rem 1rem; text-align: left; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--card); }
+    table.prob-table td { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+    table.prob-table td:first-child { color: var(--text); }
+    table.prob-table tr:last-child td { border-bottom: none; }
+    table.prob-table tr:hover td { background: var(--bg2); }
+
+    .prob-bar-cell { display: flex; align-items: center; gap: 0.5rem; }
+    .prob-bar { height: 4px; background: rgba(200,185,122,0.25); border-radius: 2px; flex: 1; }
+    .prob-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+
+    /* STATS GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1px; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .stat-box { background: var(--card); padding: 1rem 1.25rem; }
+    .stat-label { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .stat-val { font-family: var(--serif); font-size: 1.6rem; color: var(--text); }
+
+    /* EXPLAINER */
+    .explainer { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 1.5rem; }
+    .explainer h3 { font-family: var(--serif); font-size: 1.1rem; font-weight: 400; margin-bottom: 0.75rem; }
+    .explainer p { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 0.75rem; }
+    .explainer p:last-child { margin-bottom: 0; }
+    .explainer strong { color: var(--text); font-weight: 400; }
+    .math { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.5rem 1rem; margin: 0.75rem 0; display: block; }
+
+    /* WORD CLOUD */
+    #word-canvas { display: block; width: 100%; border-radius: 4px; }
+
+    /* COPY BTN */
+    .copy-btn { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.6rem; transition: all 0.2s; }
+    .copy-btn:hover { border-color: var(--b2); color: var(--text); }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 1.25rem 2.5rem; font-family: var(--mono); font-size: 0.65rem; color: var(--dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 2px; }
+
+    /* RESPONSIVE */
+    @media (max-width: 760px) {
+      main { grid-template-columns: 1fr; padding: 1.5rem 1rem; }
+      header { padding: 1rem 1.25rem; }
+      .header-badge { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="index.html">← Portfolio</a>
+  <div class="header-center">
+    <div class="header-title">Markov Chain Text Predictor</div>
+    <div class="header-sub">Probabilistic Language Model · Built with Vanilla JS</div>
+  </div>
+  <div class="header-badge">CS + Stats</div>
+</header>
+
+<main>
+
+  <!-- CORPUS INPUT -->
+  <div class="panel full">
+    <div class="panel-header">
+      <span class="panel-title">01 — Corpus Input</span>
+      <span style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);">Paste any text · The model learns from it</span>
+    </div>
+    <div class="panel-body">
+      <div class="corpus-presets">
+        <span style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);margin-right:0.25rem;align-self:center;">Presets:</span>
+        <button class="preset-btn active" data-preset="shakespeare">Shakespeare</button>
+        <button class="preset-btn" data-preset="ml">Machine Learning</button>
+        <button class="preset-btn" data-preset="sports">Sports</button>
+        <button class="preset-btn" data-preset="custom">Custom ✏</button>
+      </div>
+      <textarea class="corpus-input" id="corpus-input" placeholder="Paste any text here — the longer the better..."></textarea>
+      <div class="corpus-stats">
+        <div class="cstat">Words: <strong id="stat-words">0</strong></div>
+        <div class="cstat">Unique tokens: <strong id="stat-tokens">0</strong></div>
+        <div class="cstat">States (n-grams): <strong id="stat-states">0</strong></div>
+        <div class="cstat">Avg transitions: <strong id="stat-trans">0</strong></div>
+        <div class="cstat">Entropy: <strong id="stat-entropy">0</strong> bits</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">02 — Model Parameters</span>
+    </div>
+    <div class="panel-body">
+      <div class="control-row">
+        <div class="control-label">N-gram Order (memory depth) <span id="n-label">2</span></div>
+        <input type="range" id="n-order" min="1" max="4" value="2">
+        <div style="font-family:var(--mono);font-size:0.6rem;color:var(--dim);margin-top:0.25rem;" id="n-explain">
+          Order 2: each word depends on the previous 2 words.
+        </div>
+      </div>
+      <div class="control-row">
+        <div class="control-label">Temperature (randomness) <span id="temp-label">1.0</span></div>
+        <input type="range" id="temperature" min="1" max="30" value="10">
+        <div style="font-family:var(--mono);font-size:0.6rem;color:var(--dim);margin-top:0.25rem;">
+          Low = deterministic · High = creative / chaotic
+        </div>
+      </div>
+      <div class="control-row">
+        <div class="control-label">Output length <span id="len-label">80</span> words</div>
+        <input type="range" id="gen-length" min="10" max="300" value="80" step="5">
+      </div>
+      <div class="control-row">
+        <div class="control-label">Seed word (optional)</div>
+        <select class="ctl-select" id="seed-select">
+          <option value="">— Random start —</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-train">Build Model ▶</button>
+        <button class="btn btn-secondary" id="btn-reset">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAIN VISUALIZATION -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">03 — Transition Graph</span>
+      <span style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);">Top 12 states</span>
+    </div>
+    <div class="panel-body" style="padding:1rem;">
+      <div class="chain-wrap">
+        <canvas id="chain-canvas" width="420" height="280"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="panel full">
+    <div class="panel-header">
+      <span class="panel-title">04 — Generated Text</span>
+      <button class="copy-btn" id="copy-btn">Copy</button>
+    </div>
+    <div class="panel-body">
+      <div class="gen-controls">
+        <span class="gen-label">Generate:</span>
+        <button class="btn btn-primary" id="btn-gen" style="padding:0.4rem 1rem;">New text</button>
+        <button class="btn btn-secondary" id="btn-gen-more" style="padding:0.4rem 1rem;">Append more</button>
+      </div>
+      <div class="output-area" id="output-area">
+        <span class="output-placeholder">Build the model first, then generate text.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBABILITY TABLE -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">05 — Transition Probabilities</span>
+      <span style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);">Click a state to inspect</span>
+    </div>
+    <div class="panel-body" style="padding:1rem 0;">
+      <div style="padding:0 1rem 0.75rem;">
+        <select class="ctl-select" id="state-select" style="width:100%;">
+          <option>— Train model first —</option>
+        </select>
+      </div>
+      <div class="prob-table-wrap">
+        <table class="prob-table">
+          <thead><tr><th>Next word</th><th>Count</th><th>Probability</th><th style="min-width:80px;"></th></tr></thead>
+          <tbody id="prob-tbody">
+            <tr><td colspan="4" style="color:var(--dim);padding:1rem;text-align:center;">No state selected</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORD FREQUENCY -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">06 — Token Frequency</span>
+      <span style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);">Top words by count</span>
+    </div>
+    <div class="panel-body" style="padding:1rem;">
+      <canvas id="word-canvas" height="240"></canvas>
+    </div>
+  </div>
+
+  <!-- MODEL STATS -->
+  <div class="panel full">
+    <div class="panel-header">
+      <span class="panel-title">07 — Model Statistics</span>
+    </div>
+    <div class="panel-body" style="padding:1rem;">
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-label">Total Words</div><div class="stat-val" id="ms-words">—</div></div>
+        <div class="stat-box"><div class="stat-label">Vocabulary</div><div class="stat-val" id="ms-vocab">—</div></div>
+        <div class="stat-box"><div class="stat-label">Chain States</div><div class="stat-val" id="ms-states">—</div></div>
+        <div class="stat-box"><div class="stat-label">N-gram Order</div><div class="stat-val" id="ms-order">—</div></div>
+        <div class="stat-box"><div class="stat-label">Model Entropy</div><div class="stat-val" id="ms-entropy">—</div></div>
+        <div class="stat-box"><div class="stat-label">Perplexity</div><div class="stat-val" id="ms-perplexity">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLAINER -->
+  <div class="explainer full">
+    <h3>How it works</h3>
+    <p>
+      A <strong>Markov Chain</strong> is a probabilistic model where the next state depends only on the current state — not the full history. Applied to text, it means each word (or sequence of words) has a probability distribution over what comes next, learned entirely from the training corpus.
+    </p>
+    <code class="math">P(wₙ | wₙ₋₁, wₙ₋₂, ..., wₙ₋ₖ) ≈ count(wₙ₋ₖ...wₙ) / count(wₙ₋ₖ...wₙ₋₁)</code>
+    <p>
+      This tool builds an <strong>n-th order Markov chain</strong> from your input text. Order 1 looks at one previous word; Order 4 looks at the last 4 — producing more coherent but less novel text. <strong>Temperature</strong> controls how the probability distribution is sampled: at temperature 1.0 it samples proportionally; lower temperatures concentrate probability on the most likely next word; higher temperatures flatten the distribution toward uniform randomness.
+    </p>
+    <p>
+      <strong>Entropy</strong> measures the average unpredictability of each state in bits: H = −Σ p(x) log₂ p(x). High entropy means many equally likely transitions (creative, varied output). Low entropy means the model is very sure what comes next (deterministic, repetitive output). <strong>Perplexity</strong> = 2^H, and represents the effective branching factor at each step.
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  <span>Markov Chain Text Predictor · Christian Tyler · UNC Chapel Hill</span>
+  <span>Built with Vanilla JS · No libraries · CS + Statistics</span>
+</footer>
+
+<script>
+/* ─── CORPORA ─────────────────────────────────────────────── */
+const PRESETS = {
+  shakespeare: `To be or not to be that is the question whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune or to take arms against a sea of troubles and by opposing end them to die to sleep no more and by a sleep to say we end the heartache and the thousand natural shocks that flesh is heir to tis a consummation devoutly to be wished to die to sleep to sleep perchance to dream ay there's the rub for in that sleep of death what dreams may come when we have shuffled off this mortal coil must give us pause there's the respect that makes calamity of so long life for who would bear the whips and scorns of time the oppressor's wrong the proud man's contumely the pangs of despised love the law's delay the insolence of office and the spurns that patient merit of the unworthy takes when he himself might his quietus make with a bare bodkin who would fardels bear to grunt and sweat under a weary life but that the dread of something after death the undiscovered country from whose bourn no traveler returns puzzles the will and makes us rather bear those ills we have than fly to others that we know not of thus conscience does make cowards of us all and thus the native hue of resolution is sicklied o'er with the pale cast of thought and enterprises of great pitch and moment with this regard their currents turn awry and lose the name of action`,
+
+  ml: `Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed. Deep learning uses neural networks with many layers to model complex patterns in data. Supervised learning trains models on labeled datasets to make predictions on new data. Unsupervised learning finds hidden structure in unlabeled data through clustering and dimensionality reduction. Reinforcement learning trains agents to make decisions by rewarding desired behaviors. Neural networks are inspired by the human brain and consist of interconnected nodes that process information. Gradient descent is an optimization algorithm that minimizes loss functions by iteratively adjusting model parameters. Backpropagation computes gradients of the loss with respect to model parameters using the chain rule. Overfitting occurs when a model learns noise in training data and fails to generalize to new data. Regularization techniques like dropout and weight decay reduce overfitting. Convolutional neural networks excel at image recognition tasks by learning spatial hierarchies. Transformer models revolutionized natural language processing using self-attention mechanisms. Large language models trained on massive text corpora demonstrate emergent capabilities. Feature engineering involves selecting and transforming raw data into informative representations for machine learning algorithms.`,
+
+  sports: `Soccer is the world's most popular sport played by over two hundred countries. The beautiful game requires skill speed stamina and tactical intelligence from every player. Strikers must have clinical finishing ability and movement to create chances. Midfielders control the tempo of the game by distributing the ball effectively. Defenders read the game and position themselves to cut out danger before it arrives. Goalkeepers are the last line of defense and must command their penalty area with authority. Pressing high up the pitch forces turnovers and creates scoring opportunities. Counter-attacking football relies on winning the ball and transitioning quickly. Set pieces including corners free kicks and penalties are crucial moments in close matches. Teams that dominate possession can control the tempo and tire out their opponents. The offside trap is a defensive strategy to catch forwards in illegal positions. Dribbling past defenders creates numerical advantages and opens up spaces. Long balls over the defense can exploit pace against a high defensive line. The false nine drops deep to create space for runners from midfield. Wing play stretches defenses and creates crossing opportunities into the penalty box.`
+};
+
+/* ─── STATE ──────────────────────────────────────────────── */
+let chain = new Map();   // key: "w1 w2" → Map(next → count)
+let starts = [];         // valid sentence-start n-grams
+let trained = false;
+let N = 2;
+let totalWords = 0, vocab = new Set(), outputTokens = [];
+
+/* ─── TOKENIZE ───────────────────────────────────────────── */
+function tokenize(text) {
+  return text
+    .toLowerCase()
+    .replace(/[""'']/g, "'")
+    .replace(/[^\w\s''-]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 0);
+}
+
+/* ─── BUILD MODEL ────────────────────────────────────────── */
+function buildModel(tokens, order) {
+  chain = new Map();
+  starts = [];
+  N = order;
+  totalWords = tokens.length;
+  vocab = new Set(tokens);
+
+  for (let i = 0; i < tokens.length - order; i++) {
+    const key = tokens.slice(i, i + order).join(' ');
+    const next = tokens[i + order];
+    if (!chain.has(key)) chain.set(key, new Map());
+    const m = chain.get(key);
+    m.set(next, (m.get(next) || 0) + 1);
+    // mark sentence starts (capitalized-ish or beginning)
+    if (i === 0 || tokens[i - 1].match(/[.!?]$/)) starts.push(key);
+  }
+}
+
+/* ─── SAMPLE WITH TEMPERATURE ───────────────────────────── */
+function sample(nextMap, temp) {
+  const entries = [...nextMap.entries()];
+  const total = entries.reduce((s, [, c]) => s + c, 0);
+  const probs = entries.map(([w, c]) => [w, Math.pow(c / total, 1 / temp)]);
+  const psum = probs.reduce((s, [, p]) => s + p, 0);
+  let r = Math.random() * psum;
+  for (const [w, p] of probs) { r -= p; if (r <= 0) return w; }
+  return probs[probs.length - 1][0];
+}
+
+/* ─── GENERATE ───────────────────────────────────────────── */
+function generate(maxWords, temp, seed) {
+  if (!trained) return [];
+  const keys = [...chain.keys()];
+  let current;
+  if (seed && keys.some(k => k.startsWith(seed + ' ') || k === seed)) {
+    const matches = keys.filter(k => k.startsWith(seed + ' ') || k.split(' ')[0] === seed);
+    current = matches[Math.floor(Math.random() * matches.length)].split(' ');
+  } else if (starts.length > 0) {
+    current = starts[Math.floor(Math.random() * starts.length)].split(' ');
+  } else {
+    current = keys[Math.floor(Math.random() * keys.length)].split(' ');
+  }
+
+  const result = [...current];
+  for (let i = 0; i < maxWords - N; i++) {
+    const key = current.slice(-N).join(' ');
+    const nextMap = chain.get(key);
+    if (!nextMap) break;
+    const next = sample(nextMap, temp);
+    result.push(next);
+    current.push(next);
+  }
+  return result;
+}
+
+/* ─── ENTROPY ────────────────────────────────────────────── */
+function computeEntropy() {
+  let totalH = 0, count = 0;
+  for (const nextMap of chain.values()) {
+    const total = [...nextMap.values()].reduce((s, c) => s + c, 0);
+    let H = 0;
+    for (const c of nextMap.values()) {
+      const p = c / total;
+      H -= p * Math.log2(p);
+    }
+    totalH += H;
+    count++;
+  }
+  return count > 0 ? totalH / count : 0;
+}
+
+/* ─── CORPUS STATS ───────────────────────────────────────── */
+function updateCorpusStats(tokens) {
+  document.getElementById('stat-words').textContent = tokens.length.toLocaleString();
+  document.getElementById('stat-tokens').textContent = new Set(tokens).size.toLocaleString();
+  document.getElementById('stat-states').textContent = chain.size.toLocaleString();
+  const avgT = chain.size > 0
+    ? ([...chain.values()].reduce((s, m) => s + m.size, 0) / chain.size).toFixed(1)
+    : '0';
+  document.getElementById('stat-trans').textContent = avgT;
+  const H = computeEntropy();
+  document.getElementById('stat-entropy').textContent = H.toFixed(2);
+}
+
+/* ─── MODEL STATS ────────────────────────────────────────── */
+function updateModelStats() {
+  const H = computeEntropy();
+  document.getElementById('ms-words').textContent = totalWords.toLocaleString();
+  document.getElementById('ms-vocab').textContent = vocab.size.toLocaleString();
+  document.getElementById('ms-states').textContent = chain.size.toLocaleString();
+  document.getElementById('ms-order').textContent = N;
+  document.getElementById('ms-entropy').textContent = H.toFixed(2) + ' bits';
+  document.getElementById('ms-perplexity').textContent = Math.pow(2, H).toFixed(1);
+}
+
+/* ─── STATE SELECT ───────────────────────────────────────── */
+function populateStateSelect() {
+  const sel = document.getElementById('state-select');
+  sel.innerHTML = '<option value="">— Pick a state —</option>';
+  const sorted = [...chain.entries()]
+    .sort((a, b) => [...b[1].values()].reduce((s,c)=>s+c,0) - [...a[1].values()].reduce((s,c)=>s+c,0))
+    .slice(0, 100);
+  for (const [key] of sorted) {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = key;
+    sel.appendChild(opt);
+  }
+}
+
+function renderProbTable(key) {
+  const tbody = document.getElementById('prob-tbody');
+  if (!key || !chain.has(key)) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--dim);padding:1rem;text-align:center;">No state selected</td></tr>';
+    return;
+  }
+  const nextMap = chain.get(key);
+  const total = [...nextMap.values()].reduce((s, c) => s + c, 0);
+  const sorted = [...nextMap.entries()].sort((a, b) => b[1] - a[1]);
+  tbody.innerHTML = sorted.map(([w, c]) => {
+    const p = c / total;
+    return `<tr>
+      <td>${w}</td>
+      <td>${c}</td>
+      <td>${(p * 100).toFixed(1)}%</td>
+      <td><div class="prob-bar-cell"><div class="prob-bar"><div class="prob-bar-fill" style="width:${(p*100).toFixed(1)}%"></div></div></div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ─── CHAIN GRAPH ────────────────────────────────────────── */
+function drawChainGraph() {
+  const canvas = document.getElementById('chain-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const top = [...chain.entries()]
+    .sort((a, b) => [...b[1].values()].reduce((s,c)=>s+c,0) - [...a[1].values()].reduce((s,c)=>s+c,0))
+    .slice(0, 12);
+
+  if (top.length === 0) return;
+
+  const R = 28;
+  const cx = W / 2, cy = H / 2;
+  const radius = Math.min(W, H) / 2 - R - 20;
+  const positions = top.map((_, i) => {
+    const angle = (2 * Math.PI * i / top.length) - Math.PI / 2;
+    return { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
+  });
+
+  // draw edges
+  top.forEach(([key, nextMap], i) => {
+    const from = positions[i];
+    const topNext = [...nextMap.entries()].sort((a,b) => b[1]-a[1]).slice(0, 2);
+    topNext.forEach(([w]) => {
+      const toIdx = top.findIndex(([k]) => k.split(' ').slice(1).join(' ') === w ||
+                                           k.endsWith(' ' + w) ||
+                                           k === w);
+      if (toIdx === -1 || toIdx === i) return;
+      const to = positions[toIdx];
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.strokeStyle = 'rgba(200,185,122,0.18)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // arrowhead
+      const angle = Math.atan2(to.y - from.y, to.x - from.x);
+      const ax = to.x - R * Math.cos(angle);
+      const ay = to.y - R * Math.sin(angle);
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(ax - 8 * Math.cos(angle - 0.4), ay - 8 * Math.sin(angle - 0.4));
+      ctx.lineTo(ax - 8 * Math.cos(angle + 0.4), ay - 8 * Math.sin(angle + 0.4));
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(200,185,122,0.3)';
+      ctx.fill();
+    });
+  });
+
+  // draw nodes
+  top.forEach(([key, nextMap], i) => {
+    const { x, y } = positions[i];
+    const total = [...nextMap.values()].reduce((s,c)=>s+c,0);
+    const nodeR = Math.min(R, 14 + Math.log(total + 1) * 3);
+    ctx.beginPath();
+    ctx.arc(x, y, nodeR, 0, 2 * Math.PI);
+    ctx.fillStyle = '#1f1f1d';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(200,185,122,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    const label = key.length > 10 ? key.slice(0, 9) + '…' : key;
+    ctx.fillStyle = '#e8e6e0';
+    ctx.font = '9px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, x, y);
+  });
+}
+
+/* ─── WORD FREQ CHART ────────────────────────────────────── */
+function drawWordFreq(tokens) {
+  const canvas = document.getElementById('word-canvas');
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width - 32;
+  canvas.height = 240;
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','is','was','it','that','this','as','be','are','were','he','she','they','we','i','his','her','their','my','our','its','not','by','from','have','had','has','do','did','will','would','could','should','may','might','what','when','where','who','how','if','then','than','so','no','more','all','been','one','which','there','about','out','up','him','them','me','us','you','your','your','can','into','has','its']);
+
+  const freq = new Map();
+  tokens.forEach(w => { if (!stopWords.has(w) && w.length > 2) freq.set(w, (freq.get(w)||0)+1); });
+  const top = [...freq.entries()].sort((a,b)=>b[1]-a[1]).slice(0, 20);
+  if (top.length === 0) return;
+
+  const maxCount = top[0][1];
+  const bw = W / top.length;
+  const pad = 3;
+
+  top.forEach(([word, count], i) => {
+    const h = ((count / maxCount) * (H - 40));
+    const x = i * bw + pad;
+    const y = H - h - 24;
+
+    const alpha = 0.2 + 0.6 * (count / maxCount);
+    ctx.fillStyle = `rgba(200,185,122,${alpha})`;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, bw - pad * 2, h, 2);
+    else ctx.rect(x, y, bw - pad * 2, h);
+    ctx.fill();
+
+    ctx.fillStyle = '#4a4844';
+    ctx.font = '8px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.save();
+    ctx.translate(x + (bw - pad * 2) / 2, H - 8);
+    ctx.rotate(-Math.PI / 4);
+    ctx.fillText(word.slice(0, 8), 0, 0);
+    ctx.restore();
+
+    ctx.fillStyle = '#7a7870';
+    ctx.font = '8px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(count, x + (bw - pad * 2) / 2, y - 3);
+  });
+}
+
+/* ─── SEED SELECT ────────────────────────────────────────── */
+function populateSeedSelect(tokens) {
+  const sel = document.getElementById('seed-select');
+  sel.innerHTML = '<option value="">— Random start —</option>';
+  const words = [...new Set(tokens)].sort().slice(0, 80);
+  words.forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = w; opt.textContent = w;
+    sel.appendChild(opt);
+  });
+}
+
+/* ─── RENDER OUTPUT ──────────────────────────────────────── */
+function renderOutput(tokens, append) {
+  const area = document.getElementById('output-area');
+  if (!append) outputTokens = [];
+  const newStart = outputTokens.length;
+  outputTokens = outputTokens.concat(tokens);
+
+  area.innerHTML = outputTokens.map((w, i) => {
+    const isNew = i >= newStart;
+    // capitalize first word or after sentence-ending punctuation
+    let display = w;
+    if (i === 0 || (i > 0 && outputTokens[i-1].match(/[.!?]$/))) {
+      display = w.charAt(0).toUpperCase() + w.slice(1);
+    }
+    return `<span class="token${isNew ? ' new' : ''}">${display} </span>`;
+  }).join('');
+
+  // fade new tokens
+  setTimeout(() => {
+    area.querySelectorAll('.token.new').forEach(el => el.classList.remove('new'));
+  }, 800);
+}
+
+/* ─── TRAIN ──────────────────────────────────────────────── */
+function train() {
+  const text = document.getElementById('corpus-input').value;
+  if (!text.trim()) { alert('Please enter some text first.'); return; }
+  const order = +document.getElementById('n-order').value;
+  const tokens = tokenize(text);
+  buildModel(tokens, order);
+  trained = true;
+
+  updateCorpusStats(tokens);
+  updateModelStats();
+  populateStateSelect();
+  populateSeedSelect(tokens);
+  drawChainGraph();
+  drawWordFreq(tokens);
+
+  document.getElementById('output-area').innerHTML = '<span class="output-placeholder">Model trained! Hit "New text" to generate.</span>';
+  outputTokens = [];
+}
+
+/* ─── CONTROLS WIRING ────────────────────────────────────── */
+document.getElementById('n-order').addEventListener('input', e => {
+  const v = +e.target.value;
+  document.getElementById('n-label').textContent = v;
+  const explains = ['','Order 1: each word depends only on 1 previous word. Very random.','Order 2: each word depends on the previous 2 words.','Order 3: more coherent — depends on 3 previous words.','Order 4: very faithful to source style — depends on 4 words.'];
+  document.getElementById('n-explain').textContent = explains[v] || '';
+});
+
+document.getElementById('temperature').addEventListener('input', e => {
+  document.getElementById('temp-label').textContent = (+e.target.value / 10).toFixed(1);
+});
+
+document.getElementById('gen-length').addEventListener('input', e => {
+  document.getElementById('len-label').textContent = e.target.value;
+});
+
+document.getElementById('btn-train').addEventListener('click', train);
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  chain = new Map(); starts = []; trained = false; outputTokens = [];
+  document.getElementById('output-area').innerHTML = '<span class="output-placeholder">Build the model first, then generate text.</span>';
+  document.getElementById('prob-tbody').innerHTML = '<tr><td colspan="4" style="color:var(--dim);padding:1rem;text-align:center;">No state selected</td></tr>';
+  document.getElementById('state-select').innerHTML = '<option>— Train model first —</option>';
+  document.getElementById('seed-select').innerHTML = '<option value="">— Random start —</option>';
+  ['ms-words','ms-vocab','ms-states','ms-order','ms-entropy','ms-perplexity'].forEach(id => document.getElementById(id).textContent = '—');
+  ['stat-words','stat-tokens','stat-states','stat-trans','stat-entropy'].forEach(id => document.getElementById(id).textContent = '0');
+  const ctx = document.getElementById('chain-canvas').getContext('2d');
+  ctx.clearRect(0,0,420,280);
+  const ctx2 = document.getElementById('word-canvas').getContext('2d');
+  ctx2.clearRect(0,0,ctx2.canvas.width,240);
+});
+
+document.getElementById('btn-gen').addEventListener('click', () => {
+  if (!trained) { alert('Train the model first.'); return; }
+  const temp = +document.getElementById('temperature').value / 10;
+  const len = +document.getElementById('gen-length').value;
+  const seed = document.getElementById('seed-select').value;
+  const tokens = generate(len, temp, seed);
+  renderOutput(tokens, false);
+});
+
+document.getElementById('btn-gen-more').addEventListener('click', () => {
+  if (!trained) { alert('Train the model first.'); return; }
+  const temp = +document.getElementById('temperature').value / 10;
+  const len = Math.floor(+document.getElementById('gen-length').value / 2);
+  const tokens = generate(len, temp, '');
+  renderOutput(tokens, true);
+});
+
+document.getElementById('copy-btn').addEventListener('click', () => {
+  const text = outputTokens.join(' ');
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+});
+
+document.getElementById('state-select').addEventListener('change', e => {
+  renderProbTable(e.target.value);
+});
+
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const key = btn.dataset.preset;
+    const ta = document.getElementById('corpus-input');
+    if (key === 'custom') {
+      ta.value = '';
+      ta.placeholder = 'Paste your own text here...';
+      ta.focus();
+    } else {
+      ta.value = PRESETS[key];
+    }
+    // update word count preview
+    const t = tokenize(ta.value);
+    document.getElementById('stat-words').textContent = t.length;
+  });
+});
+
+// Set default corpus
+document.getElementById('corpus-input').value = PRESETS.shakespeare;
+document.getElementById('stat-words').textContent = tokenize(PRESETS.shakespeare).length;
+</script>
+</body>
+</html>
